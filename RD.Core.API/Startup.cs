@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using RD.Core.API.Controllers;
 using RD.Core.CAP;
 using System;
 using System.Collections.Generic;
@@ -15,8 +16,18 @@ using System.Threading.Tasks;
 
 namespace RD.Core.API
 {
+    public static class CAPConfiguration
+    {
+        public static IServiceCollection AddIntegrationEventHandler(this IServiceCollection services)
+        {
+            services.AddTransient<SampleEventHandler>();
+         
+            return services;
+        }
+    }
     public class Startup
     {
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -27,8 +38,9 @@ namespace RD.Core.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddCAP();
+            services.AddEventHandler<SampleEventHandler>();
             services.AddControllers();
+            services.AddIntegrationEventHandler();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "RD.Core.API", Version = "v1" });

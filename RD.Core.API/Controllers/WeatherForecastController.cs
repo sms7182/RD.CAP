@@ -1,6 +1,7 @@
 ﻿using DotNetCore.CAP;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using RD.Core.CAP;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,8 +9,13 @@ using System.Threading.Tasks;
 
 namespace RD.Core.API.Controllers
 {
+    public class SecondSampleEvent:IEvent
+    {
+        public Guid Id { get; set; }
+        public string Title { get; set; }
+    }
     
-    public class SampleEvent
+    public class SampleEvent:IEvent
     {
         public Guid Id { get; set; }
     }
@@ -52,10 +58,25 @@ namespace RD.Core.API.Controllers
             return Ok(sampleEvent);
         }
 
-        //[CapSubscribe(nameof(SampleEvent))]
-        //public void CheckReceivedMessage(SampleEvent sampleEvent)
-        //{
-
-        //}
     }
+
+    public class SampleEventHandler: BaseEventHandler<SampleEvent>
+    {
+        readonly ICapPublisher _capPublisher;
+        public SampleEventHandler(ICapPublisher capPublisher)
+        {
+            _capPublisher = capPublisher;
+        }
+        [CapSubscribe(nameof(SampleEvent))]
+        public async Task Handle(SampleEvent sampleEvent)
+        {
+            var secondSampleEvent=new SecondSampleEvent();
+            secondSampleEvent.Id = sampleEvent.Id;
+            secondSampleEvent.Title = sampleEvent.Id.ToString().Substring(0, 4);
+          await  _capPublisher.PublishAsync(nameof(SecondSampleEvent), secondSampleEvent);
+        }
+
+    }
+
+
 }
