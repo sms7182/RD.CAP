@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.Threading.Tasks;
@@ -13,11 +14,13 @@ namespace RD.Core.CAP.ExampleEvent
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
-              Host.CreateDefaultBuilder(args).ConfigureServices((host,services)=> {
+              Host.CreateDefaultBuilder(args)
+            .ConfigureAppConfiguration((hostContext, builder) => { builder.AddUserSecrets<CAPInfoUserSecret>(); })
+            .ConfigureServices((host,services)=> {
+                var secret = (CAPInfoUserSecret)host.Configuration.GetSection(typeof(CAPInfoUserSecret).Name).Get<CAPInfoUserSecret>();
+                services.AddScoped<IExampleService, ExampleService>();
                   
-                  services.AddScoped<IExampleService, ExampleService>();
-                  
-                  services.AddEventHandler<ExampleEventHandler>("CAPDB", "mongodb://localhost:27017", "localhost", "guest", "guest"); });
+                  services.AddEventHandler<ExampleEventHandler>(secret.CAPDBName,secret.CAPDBHost,secret.RabbitMQHost, secret.RabbitUser, secret.RabbitPass); });
     }
    
 
