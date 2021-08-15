@@ -38,7 +38,7 @@ namespace RD.Core.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddEventHandler<SampleEventHandler>();
+            services.AddEventHandler<SampleEventHandler>("CAPDB", "mongodb://localhost:27017","localhost","guest","guest");
             services.AddControllers();
             services.AddIntegrationEventHandler();
             services.AddSwaggerGen(c =>

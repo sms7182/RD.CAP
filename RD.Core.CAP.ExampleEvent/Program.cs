@@ -17,7 +17,7 @@ namespace RD.Core.CAP.ExampleEvent
                   
                   services.AddScoped<IExampleService, ExampleService>();
                   
-                  services.AddEventHandler<ExampleEventHandler>(); });
+                  services.AddEventHandler<ExampleEventHandler>("CAPDB", "mongodb://localhost:27017", "localhost", "guest", "guest"); });
     }
    
 
